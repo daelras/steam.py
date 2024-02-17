@@ -85,10 +85,10 @@ class Match:
         # self.server_id = self.watch_info.server_id
 
         self.rounds: list[Round] = []
+        previous_scores = [0, 0]
         for round in match_info.roundstatsall:
             player_ids = cast(list[ID32], round.reservation.account_ids)
             team_size = len(player_ids) // len(round.team_scores)
-            previous_scores = [0] * len(round.team_scores)
             teams: list[Team] = []
             for idx, score in enumerate(round.team_scores):
                 players_: list[MatchPlayer] = []
@@ -112,6 +112,7 @@ class Match:
                     assert mvp
                     mvp.mvp = True
                 teams.append(Team(score, won, players_))
+            previous_scores = round.team_scores
             self.rounds.append(Round(timedelta(seconds=round.match_duration), teams, round.map))
 
     @property
