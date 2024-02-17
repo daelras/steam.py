@@ -86,9 +86,12 @@ class Match:
 
         self.rounds: list[Round] = []
         previous_scores = [0, 0]
+        previous_mvps = []
         for round in match_info.roundstatsall:
             player_ids = cast(list[ID32], round.reservation.account_ids)
             team_size = len(player_ids) // len(round.team_scores)
+            if len(previous_mvps) == 0:
+                previous_mvps = [0] * len(player_ids)
             teams: list[Team] = []
             for idx, score in enumerate(round.team_scores):
                 players_: list[MatchPlayer] = []
@@ -105,14 +108,15 @@ class Match:
 
                 won = round.team_scores[idx] > previous_scores[idx]
                 if won:
-                    mvp_idx, _ = max(
-                        Counter(round.mvps[(idx * team_size) : (idx + 1) * team_size]).items(), key=itemgetter(1)
-                    )  # can't have an even number of players right?
-                    mvp = utils.get(players_, id=player_ids[mvp_idx])
-                    assert mvp
-                    mvp.mvp = True
+                    for mvp_idx in range(idx * team_size, (idx + 1) * team_size - 1):
+                        if round.mvps[mvp_idx] > previous_mvps[mvp_idx]:
+                            mvp = utils.get(players_, id=player_ids[mvp_idx])
+                            assert mvp
+                            mvp.mvp = True
+                            break
                 teams.append(Team(score, won, players_))
             previous_scores = round.team_scores
+            previous_mvps = round.mvps
             self.rounds.append(Round(timedelta(seconds=round.match_duration), teams, round.map))
 
     @property
