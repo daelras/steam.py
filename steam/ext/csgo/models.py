@@ -94,13 +94,13 @@ class Match:
                 players_: list[MatchPlayer] = []
                 for id in player_ids[(idx * team_size) : (idx + 1) * team_size]:
                     player = MatchPlayer(state, players[id])
-                    idx = player_ids.index(id)
-                    player.kills = round.kills[idx]
-                    player.assists = round.assists[idx]
-                    player.deaths = round.deaths[idx]
-                    player.score = round.scores[idx]
-                    player.enemy_kills = round.enemy_kills[idx]
-                    player.enemy_head_shots = round.enemy_headshots[idx]
+                    player_idx = player_ids.index(id)
+                    player.kills = round.kills[player_idx]
+                    player.assists = round.assists[player_idx]
+                    player.deaths = round.deaths[player_idx]
+                    player.score = round.scores[player_idx]
+                    player.enemy_kills = round.enemy_kills[player_idx]
+                    player.enemy_head_shots = round.enemy_headshots[player_idx]
                     players_.append(player)
 
                 won = round.team_scores[idx] > previous_scores[idx]
